@@ -1,105 +1,137 @@
 ## Request To Resources, complete architecture on how spring security comes into picture.
 
 ```textmate
-                 CLIENT
-                    │
-        Authorization : Bearer JWT -> Client ***sends the HTTP request containing the 
-                    |                      JWT in the Authorization header***.
-                    │
-                    ▼
-             Embedded Tomcat
-                    │
-                    ▼
-           Servlet Filter Chain
-         (Container Level Filters)
-                    │
-                    ▼
+       CLIENT
+          │
+          │ Authorization: Bearer <JWT>
+          │ → Sends HTTP request containing JWT
+          │   in the Authorization header.
+          │
+          │ → HTTP Request contains:
+          │   Method + URI + Headers + optional Body + HTTP Version
+          │
+          ▼
+        Embedded Tomcat
+          │
+          │ → Receives HTTP request
+          │ → Creates/prepares HttpServletRequest
+          │
+          ▼
+        Servlet Filter Chain
+        (Container-level filter pipeline)
+          │
+          ▼
         Spring SecurityFilterChain
-         (Many Security Filters)
+          │
+          ├── CORS
+          │      → Is this browser origin allowed?
+          │
+          ├── CSRF
+          │      → Is this request protected against CSRF?
+          │      → Especially important for session/cookie auth
+          │
+          ├── JwtAuthenticationFilter ⭐
+          │      (extends OncePerRequestFilter)
+          │      |
+          │      ▼
+          │   Extract JWT from Header
+          │      │
+          │      ├── Read Authorization header
+          │      │   from HttpServletRequest
+          │      ├── Check "Bearer "
+          │      ├── Remove "Bearer "
+          │      └── Extract JWT
+          │      |
+          │      ▼
+          │     JWT
+          │      │
+          │      ├── Header
+          │      ├── Payload
+          │      │     → Contains claims
+          │      │     → sub → username
+          │      │     → exp → expiry
+          │      │
+          │      └── Signature
+          │      |
+          │      ▼
+          │   Validate JWT
+          │      │
+          │      ├── Validate Signature
+          │      │     → Has JWT been tampered with?
+          │      │     → Does signature validate with
+          │      │       expected key?
+          │      │
+          │      └── Validate Expiry
+          │      |      → Has JWT expired?
+          │      |
+          │      ▼
+          │   Extract Username → Read `sub` from Payload
+          │      |
+          │      |
+          │      ▼
+          │   UserDetailsService                               
+          │      │
+          │      ▼
+          │   Load User from DB
+          │      |
+          │      |
+          │      ▼
+          │   Create Authentication Object
+          │      |
+          │      ▼
+          │   SecurityContextHolder
+          │      └── setAuthentication(...)
+          │      |
+          │      ▼
+          │   ✅ USER IS AUTHENTICATED
+          │
+          ├── AnonymousAuthenticationFilter
+          │      → Handles requests where authentication
+          │        was not established
+          │
+          ├── ExceptionTranslationFilter
+          │      → Handles security exceptions
+          │        and translates them to HTTP responses
+          │        such as 401 / 403
+          │
+          └── AuthorizationFilter ⭐
+                 │
+                 │ → Reads Authentication from
+                 │   SecurityContext
+                 │
+                 ├── hasRole()
+                 └── hasAuthority()
+                        │
+                        ▼
+                  AUTHORIZATION
+                  → Is this authenticated user
+                    allowed to access this resource?
+                        │
+                    ┌───┴───-------------|           
+                    │                    │
+                   YES                   NO
+                    │                    │
+                    ▼                    ▼   
+             DispatcherServlet      403 Forbidden
                     │
                     ▼
-          JwtAuthenticationFilter extends OncePerRequestFilter
-                    |
-                    ▼
-         Extract JWT from Header
-                    │
-                    ├── Reads the Authorization header from the
-                    │   incoming HttpServletRequest.
-                    │
-                    ├── Verifies it starts with "Bearer ".
-                    │
-                    ├── Removes "Bearer ".
-                    │
-                    └── Extracts the JWT.
-                             │
-                             ▼
-                            JWT
-                            │
-                            ├── Header
-                   |--------├── Payload -> why userName is extracted from payload, because payload contains claims, what is claims, claims means information about the user.
-                   |        └── Signature
-                   |                 |
-                   |                 |
-                   |                 ▼
-                   |             Validate Signature
-                   |             → Has the JWT been tampered with?
-                   |             → Is the JWT signed using our server's secret/private key?
-                   |                 │
-                   |                 ▼
-                   |             Validate Expiry
-                   |             → Has the JWT expired?
-                   |             → (Checks the `exp` claim inside the Payload.)
-                   ▼
-            Extract Username -> Username is extracted from the payload.
-                   │
-                   ▼
-            UserDetailsService
-                   │
-            Load User from DB -> → Why load the user from the DB when the JWT already contains the username?
-                   │
-                   ▼
-           Password not checked -> Already authenticated, interesting, let's find out how?
-          (Already authenticated
-                using JWT)
+                Controller
                     │
                     ▼
-        Create Authentication Object
+                 Service
                     │
                     ▼
-     SecurityContextHolder.getContext() -> so this is the one which authenticates the user, let's find out how?
-          .setAuthentication(...)
-                    │
-         User is now authenticated
+                Repository
                     │
                     ▼
-         Remaining Security Filters -> more filters hahahah?
+                 Database
                     │
                     ▼
-            AuthorizationFilter
+                 Response
                     │
-             hasRole()
-             hasAuthority()
+                    ▼
+             DispatcherServlet
                     │
-                Allowed ?
-                    │
-                 ┌──┴────┐
-                 │       │
-                Yes      No
-                 │       │
-                 ▼       ▼
-     DispatcherServlet   403 Forbidden
-            │
-        Controller
-            │
-         Service
-            │
-        Repository
-            │
-        Database
-            │
-        Response
-            │
-     DispatcherServlet
-            │
-       HTTP Response
+                    ▼
+               HTTP Response
 ```
