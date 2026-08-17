@@ -5,7 +5,8 @@
             ↓
           Tomcat
             ↓
-    Servlet Filter Chain
+    Servlet Filter Chain -> Where security filter chain gets registered -> 
+            |                Within, securityFilterChain, httpBasic configuration tells that it is a "BasicAuthenticationFilter".
             ↓
      Spring Security
             ↓
@@ -15,10 +16,10 @@
             ↓
       ProviderManager
             ↓
-    DaoAuthenticationProvider -> uses passwordEncoder to verifies the password -> 
+    DaoAuthenticationProvider -> uses "passwordEncoder" to verifies the password -> 
             |                   code: daoAuthenticationProvider.setPasswordEncoder(passwordEncoder); 
-            |                   userDetailsService, with the help of loadUserByUsername method -> 
-            |                            fetches the user from the db, 
+            |                   "userDetailsService", with the help of loadUserByUsername method -> 
+            |                   fetches the user from the db, 
             |                   validates it with the user extracted via 
             |                   BasicAuthenticationFilter and then validates it.
             ↓
@@ -29,5 +30,4 @@
       Authorization
             ↓
         Controller
-
 ```

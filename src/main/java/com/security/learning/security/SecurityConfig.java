@@ -2,16 +2,15 @@ package com.security.learning.security;
 
 
 import com.security.learning.service.UserService;
-import org.hibernate.annotations.Bag;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,10 +23,13 @@ public class SecurityConfig {
     /**
      * Registration, and login must be public, or should we say it shouldn't be authenticated.
      * Be mindful, its HttpSecurity not HttpRequest.
+     * csrf is disabled here just to check if state changing request can be made.
+     * Yes it does, when csrf was put, our post request was successfully made.
      */
     @Bean
     public SecurityFilterChain basicAuth(HttpSecurity httpSecurity) throws Exception{
         httpSecurity
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers("/users/registerUser").permitAll()

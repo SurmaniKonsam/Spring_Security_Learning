@@ -7,11 +7,8 @@ import com.security.learning.repository.UsersRepository;
 import com.security.learning.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
@@ -30,17 +27,17 @@ public class SecurityController {
     @Autowired
     private UserService userService;
 
-    public record RegisterResponse(@JsonProperty("Message") String message, @JsonProperty("Users") Users users){}
+    public record RegisterResponse(@JsonProperty("Message") String message){}
 
     @PostMapping("/registerUser")
     public ResponseEntity<RegisterResponse> registerUser(@RequestBody Users users){
         try{
             userService.saveUser(users);
             return ResponseEntity.status(HttpStatus.OK).
-                    body(new RegisterResponse("User registered successfully",users));
+                    body(new RegisterResponse("User registered successfully"));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
-                    body(new RegisterResponse("User not reqistered",null));
+                    body(new RegisterResponse("User not registered"));
         }
     }
 
@@ -59,6 +56,7 @@ public class SecurityController {
     public String conquer(){
         return "You have conquered basic authentication";
     }
+
 
 
 }

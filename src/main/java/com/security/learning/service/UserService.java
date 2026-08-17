@@ -3,7 +3,6 @@ package com.security.learning.service;
 import com.security.learning.entity.Users;
 import com.security.learning.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.security.autoconfigure.SecurityProperties;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-
 
 @Service
 public class UserService implements UserDetailsService {
@@ -40,9 +38,10 @@ public class UserService implements UserDetailsService {
         return usersRepository.findUserByUserNameAndIsActive(userName,isActive).orElseThrow(()-> new UsernameNotFoundException("User not found"));
     }
 
+
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users users = getUser(username,true);
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        Users users = getUser(userName,true);
 
         return User
                 .builder()
