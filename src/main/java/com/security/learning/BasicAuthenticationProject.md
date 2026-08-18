@@ -5,10 +5,15 @@
             ↓
           Tomcat
             ↓
-    Servlet Filter Chain -> Where security filter chain gets registered -> 
-            |                Within, securityFilterChain, httpBasic configuration tells that it is a "BasicAuthenticationFilter".
+    Servlet Filter Chain -> Where security filter chain gets registered into servlet filter container, 
+            |               why? 
+            |               - {The Servlet container provides the mechanism that runs filters before reaching dispatcher servlet} -> 
+            |               Within -> securityFilterChain, 
+            |                                   ↓
+            |                           httpBasic(Customer.withDefaults()); configuration tells:
+            |                            that it is a "BasicAuthenticationFilter".
             ↓
-     Spring Security
+     Spring Security -> Security Filter Chain.
             ↓
   BasicAuthenticationFilter
             ↓
