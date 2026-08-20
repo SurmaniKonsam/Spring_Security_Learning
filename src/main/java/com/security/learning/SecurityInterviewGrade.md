@@ -43,9 +43,9 @@ SecurityFilterChain is not something the request is "called into" like a control
 So Tomcat effectively says:
 - “Before I give this request to the DispatcherServlet, I have these filters that must process it."
 
-And the filter is basic authentication type filter, so now spring knows which filter to process.
+And the filter we first learnt was "basic authentication type filter", so now spring knows which filter to process.
     - Tomcat receives the HTTP request → 
-    - the request passes through the Servlet Filter Chain → 
+    - the request passes through the Servlet Filter Container.
     - Spring Security's filters process it. httpBasic() tells Spring Security to enable Basic Authentication. 
             BasicAuthenticationFilter extracts the credentials and starts authentication. 
     - The AuthenticationManager our ProviderManager gives the authentication job to DaoAuthenticationProvider. 
@@ -106,3 +106,5 @@ security checks for whether the server requires it or not.
     BasicAuthenticationFilter extracts those credentials and passes them to the 
     authentication system for verification.
 ```
+
+### What is the use of security-context holder?

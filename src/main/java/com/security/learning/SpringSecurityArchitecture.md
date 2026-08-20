@@ -28,10 +28,10 @@
                     Spring SecurityFilterChain -> 
                       │
                       ├── CORS
-                      │      → Is this browser origin allowed?
+                      │      → Is this browser origin allowed? -> Left
                       │
                       ├── CSRF
-                      │      → Is this request protected against CSRF?
+                      │      → Is this request protected against CSRF? -> done
                       │      → Especially important for session/cookie auth
                       │
                       ├── JwtAuthenticationFilter ⭐
@@ -89,11 +89,11 @@
                       │      ▼
                       │   ✅ USER IS AUTHENTICATED
                       │
-                      ├── AnonymousAuthenticationFilter
+                      ├── AnonymousAuthenticationFilter -> Left
                       │      → Handles requests where authentication
                       │        was not established
                       │
-                      ├── ExceptionTranslationFilter
+                      ├── ExceptionTranslationFilter -> left
                       │      → Handles security exceptions
                       │        and translates them to HTTP responses
                       │        such as 401 / 403
