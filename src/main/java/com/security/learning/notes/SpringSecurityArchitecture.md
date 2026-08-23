@@ -76,7 +76,7 @@
                       │   UserDetailsService                               
                       │      │
                       │      ▼
-                      │   Load User from DB
+                      │   Load User from DB -> Done.
                       │      |
                       │      |
                       │      ▼

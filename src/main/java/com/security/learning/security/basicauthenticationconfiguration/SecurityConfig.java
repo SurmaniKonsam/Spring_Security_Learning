@@ -1,6 +1,7 @@
 package com.security.learning.security.basicauthenticationconfiguration;
 
 
+import com.security.learning.security.jwtfilterconfiguration.JwtToken;
 import com.security.learning.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain basicAuth(HttpSecurity httpSecurity) throws Exception{
         httpSecurity
+                .csrf(x -> x.disable())
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers("/users/registerUser").permitAll()
@@ -50,6 +52,11 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public JwtToken jwtToken(){
+        return new JwtToken();
     }
 
     @Bean

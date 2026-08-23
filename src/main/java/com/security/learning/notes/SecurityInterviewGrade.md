@@ -98,6 +98,8 @@ requestMatchers is where you will defined the endpoint which requires special pr
 - Spring Security decides what the server requires; the client decides what it sends.
 - the client sends the http request, the credentials required for the authentication form, then spring
 security checks for whether the server requires it or not.
+- no-auth is spring security default authentication window, which the user expects if spring-security dependency
+is added.
 ```
 
 ### What does "basic-auth" authentication type do?
