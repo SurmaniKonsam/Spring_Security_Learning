@@ -1,33 +1,41 @@
 package com.security.learning.security.basicauthenticationconfiguration;
 
 
+import com.security.learning.security.jwtfilterconfiguration.JwtFilter;
 import com.security.learning.security.jwtfilterconfiguration.JwtToken;
 import com.security.learning.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.authorization.method.PostAuthorizeAuthorizationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private JwtFilter jwtFilter;
 
     /**
      * Registration, and login must be public, or should we say it shouldn't be authenticated.
      * Be mindful, its HttpSecurity not HttpRequest.
      * csrf is disabled here just to check if state changing request can be made.
      * Yes it does, when csrf was put, our post request was successfully made.
+     * .csrf(x -> x.disable()) -> to disable csrf
      */
     @Bean
     public SecurityFilterChain basicAuth(HttpSecurity httpSecurity) throws Exception{
@@ -37,9 +45,10 @@ public class SecurityConfig {
                         auth
                                 .requestMatchers("/users/registerUser").permitAll()
                                 .requestMatchers(("/users/csrf")).permitAll()
+                                .requestMatchers(("/users/authenticate")).permitAll()
                                 .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults());
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
 
     }
@@ -54,10 +63,18 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+//    @Bean
+//    public JwtToken jwtToken(){
+//        return new JwtToken();
+//    }
+
+    /*
     @Bean
-    public JwtToken jwtToken(){
-        return new JwtToken();
+    public JwtFilter jwtFilter(){
+        return new JwtFilter();
     }
+
+     */
 
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,PasswordEncoder passwordEncoder){

@@ -75,6 +75,7 @@ class SecurityController {
         Therefore, we are using auth request
         Therefore, we are using UserNameAndPasswordAuthentication
         PostMapping -> have a request body, that's the basic concept i know by now.
+        Time to make note.
      */
     @PostMapping("/authenticate")
     public String generateJwtToken(@RequestBody AuthBody authBody){
@@ -87,7 +88,6 @@ class SecurityController {
         if(authenticate.isAuthenticated()){
             //return jwtTokenGeneration
             return jwtTokenGeneration.generateToken(authBody.getUserName());
-
         }
         return null;
     }
