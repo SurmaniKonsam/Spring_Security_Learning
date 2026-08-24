@@ -1,6 +1,7 @@
 package com.security.learning.security.jwtfilterconfiguration;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +27,6 @@ public class JwtFilter extends OncePerRequestFilter {
     private JwtToken jwtTokenService;
 
     /**
-     *
      * @param request -> This will get us the token via header Authorization.
      *                Token, is all we need to check the signed signature.
      */
@@ -49,19 +49,20 @@ public class JwtFilter extends OncePerRequestFilter {
         token = authorizationHeader.split(" ")[1];
 
         if(SecurityContextHolder.getContext().getAuthentication()==null){
-            Claims claims = jwtTokenService.verifySignatureAndExtractClaims(token);
-            System.out.println("Authentication is null");
-            if(!jwtTokenService.isTokenExpired(token)){
+            try {
+                Claims claims = jwtTokenService.verifySignatureAndExtractClaims(token);
+                System.out.println("Authentication is null");
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(claims.getSubject(),null, Collections.emptyList());
+                        new UsernamePasswordAuthenticationToken(claims.getSubject(), null, Collections.emptyList());
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            }catch (ExpiredJwtException e){
+                System.out.println(e.getMessage());
             }
         }
 
         System.out.println("Authentication :"+SecurityContextHolder.getContext().getAuthentication());
 
         filterChain.doFilter(request,response );
-
     }
 }

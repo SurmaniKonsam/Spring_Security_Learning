@@ -1,5 +1,9 @@
 ## JWT Architecture.
 
+### Above all always remember this?
+```textmate
+Your JWT logic needs to happen before the request reaches the controller:
+```
 ```textmate
     POST /login -> you need to have csrf disabled, 
        |            for this to pass successfully from the authentication gate. 
