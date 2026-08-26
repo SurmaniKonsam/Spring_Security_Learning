@@ -80,6 +80,8 @@ filter logic runs once per request dispatch.
 ```
 
 
+### 4. Why can't we just add all the roles, permissions, required configuration up in the claims, instead of SecurityContextHolder()?
+
 ### 4. What does SecurityContextHolder() does? **_most important_**
 ```textmate
     - Spring Security has its own object for saying:
@@ -87,9 +89,10 @@ filter logic runs once per request dispatch.
               ↓
           belongs to
               ↓
-           claims.getSubject() --> userName/to this user.
+          claims.getSubject() --> userName/to this user.
         
           That object is: Authentication/UsernamePasswordAuthenticationToken.
-    - SecurityContextHolder holds the Authentication object, and Spring Security uses that Authentication during authorization checks..
+    - SecurityContextHolder holds the Authentication object, and Spring Security uses that Authentication object
+      during authorization checks..
           
 ```
