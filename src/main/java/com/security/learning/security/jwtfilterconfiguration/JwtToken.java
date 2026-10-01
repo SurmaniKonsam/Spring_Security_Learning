@@ -20,12 +20,10 @@ import java.util.Map;
 @Component
 public class JwtToken {
 
-    private final String mySecretKey = "7f3c9a2e6d1b8f405c7e2a91d4f6380b9e5c1a7d3f2b8e604c9a1d5f7b3e6c20";
-
     //It also means,i can call method inside a method.
     public String generateToken(String username){
         /**
-         * Testing token with only 2 minutes, time limit.
+         * Testing token with only 3 minutes, time limit.
          */
         Date expiry = new Date(System.currentTimeMillis() + 1000L*60*3);
         return Jwts.builder()
@@ -39,6 +37,7 @@ public class JwtToken {
     }
 
     private Key getSignedKey(){
+        String mySecretKey = "7f3c9a2e6d1b8f405c7e2a91d4f6380b9e5c1a7d3f2b8e604c9a1d5f7b3e6c20";
         return Keys.hmacShaKeyFor(mySecretKey.getBytes());
     }
 
